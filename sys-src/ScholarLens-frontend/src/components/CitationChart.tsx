@@ -18,7 +18,7 @@ const CitationChart = () => {
   }));
 
   return (
-    <BarChart width={500} height={150} data={data}>
+    <BarChart width={280} height={150} data={data}>
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis dataKey="year" />
       <YAxis />

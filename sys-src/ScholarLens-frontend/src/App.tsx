@@ -6,18 +6,31 @@ import InstitutesPage from './pages/InstitutesPage'
 import ScholarsPage from './pages/ScholarsPage'
 import ScholarDetailPage from './pages/ScholarDetailPage'
 import InstitutDetailPage from './pages/InstitutDetailPage'
-function App() {
+import { Box } from '@mui/material'
 
+function App() {
   return (
     <>
       <ResponsiveAppBar />
-      <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/scholars" element={<ScholarsPage />} />
-      <Route path="/institutes" element={<InstitutesPage />} />
-      <Route path="/scholars/:scholarId" element={<ScholarDetailPage />} />
-      <Route path="/institutes/:instituteId" element={<InstitutDetailPage />} />
-    </Routes>
+      <Box 
+        component="main" 
+        sx={{ 
+          display: 'flex',
+          justifyContent: 'center',
+          p: { xs: '1rem', sm: '6rem' }
+        }}
+      >
+        <Box>
+          <InstitutDetailPage/>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/scholars" element={<ScholarsPage />} />
+            <Route path="/institutes" element={<InstitutesPage />} />
+            <Route path="/scholars/:scholarId" element={<ScholarDetailPage />} />
+            <Route path="/institutes/:instituteId" element={<InstitutDetailPage />} />
+          </Routes>
+        </Box>
+      </Box>
     </>
   )
 }

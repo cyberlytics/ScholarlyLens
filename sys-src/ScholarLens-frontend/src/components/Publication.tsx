@@ -1,4 +1,4 @@
-import { Box, Typography, Paper } from "@mui/material";
+import { Typography, Paper } from "@mui/material";
 
 const Publication = () => {
   const title = "Fully automatic breast segmentation in 3D breast MRI";
