@@ -1,12 +1,14 @@
 import { Box, Typography, IconButton, Avatar } from '@mui/material';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
+import { Author } from '../apiModels/AuthorsInterface';
 
-const ScholarRankCard = () => {
-  const scholarName = "Horst Karl Hahn";
-  const scholarsAffiliation = "Institut director at OTH-AW";
-  const rank = 1;
+interface ScholarRankCardProps {
+  author: Author;
+  rank: number;
+}
 
+const ScholarRankCard = ({ author, rank }: ScholarRankCardProps) => {
   return (
     <Box
       sx={{
@@ -48,13 +50,13 @@ const ScholarRankCard = () => {
       {/* Main Content */}
       <Box sx={{ flexGrow: 1 }}>
         <Typography sx={{ fontWeight: 600, fontSize: '1.25rem' }}>
-          {scholarName}
+          {author.name}
         </Typography>
         <Typography sx={{ fontSize: '1rem', color: 'text.secondary' }}>
-          {scholarsAffiliation}
+          {author.affiliation || '—'}
         </Typography>
         <Typography sx={{ fontSize: '0.95rem', color: 'gray' }}>
-          Zitate: 531&nbsp;&nbsp;|&nbsp;&nbsp;H-Index: 531&nbsp;&nbsp;|&nbsp;&nbsp;i10-Index: 531
+          Zitate: {author.citations ?? '—'}&nbsp;&nbsp;|&nbsp;&nbsp;H-Index: {author.h_index ?? '—'}&nbsp;&nbsp;|&nbsp;&nbsp;i10-Index: {author.i10_index ?? '—'}
         </Typography>
       </Box>
 
