@@ -2,7 +2,14 @@ import { Box } from "@mui/material"
 
 import CitationChart from "./CitationChart"
 
-const Analytics = () => {
+interface AnalyticsProps {
+  citations?: number;
+  hIndex?: number;
+  i10Index?: number;
+  cites_per_year?: {};
+}
+
+const Analytics: React.FC<AnalyticsProps> = ({ citations, hIndex, i10Index, cites_per_year }) => {
   return (
     <Box sx={{ 
       display: 'flex', 
@@ -12,18 +19,18 @@ const Analytics = () => {
       padding: '1.5rem'
     }}>
       <div>
-        <CitationChart/>
+        <CitationChart cites_per_year={cites_per_year}/>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <div>Zitate: 531</div>
+        <div>Zitate: {citations ?? '—'}</div>
         <div>last5y: 530</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <div>H-Index: 12</div>
+        <div>H-Index: {hIndex ?? '—'}</div>
         <div>last5y: 530</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <div>I10-Index: 34</div>
+        <div>I10-Index: {i10Index ?? '—'}</div>
         <div>last5y: 530</div>
       </div>
     </Box>

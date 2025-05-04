@@ -2,6 +2,8 @@ import { Box, Typography, IconButton, Avatar } from '@mui/material';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import { Author } from '../apiModels/AuthorsInterface';
+import { useNavigate } from 'react-router-dom';
+
 
 interface ScholarRankCardProps {
   author: Author;
@@ -9,6 +11,8 @@ interface ScholarRankCardProps {
 }
 
 const ScholarRankCard = ({ author, rank }: ScholarRankCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <Box
       sx={{
@@ -60,8 +64,8 @@ const ScholarRankCard = ({ author, rank }: ScholarRankCardProps) => {
         </Typography>
       </Box>
 
-      {/* Arrow Button */}
-      <IconButton sx={{ padding: 0 }}>
+      // TODO change author.name to id tauschen or so
+      <IconButton sx={{ padding: 0 }} onClick={() => navigate(`/scholars/${encodeURIComponent(author.name)}`)}>
         <NavigateNextRoundedIcon sx={{ fontSize: '2.5rem', color: 'black' }} />
       </IconButton>
     </Box>

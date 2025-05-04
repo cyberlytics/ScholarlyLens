@@ -32,7 +32,7 @@ console.log(data)
             <Route path="/" element={<HomePage />} />
             <Route path="/scholars" element={<ScholarsPage authors={data?.authors ?? []}/>} />
             <Route path="/institutes" element={<InstitutesPage />} />
-            <Route path="/scholars/:scholarId" element={<ScholarDetailPage />} />
+            <Route path="/scholars/:scholarId" element={<ScholarDetailPage authors={data?.authors ?? []}/>} />
             <Route path="/institutes/:instituteId" element={<InstitutDetailPage />} />
           </Routes>
         </Box>
