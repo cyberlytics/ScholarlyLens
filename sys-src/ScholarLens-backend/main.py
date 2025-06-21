@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from database.dbConnection import connect_to_mongo, close_mongo_connection
-from database.authorsApi import search_and_save_authors, update_author, get_all_authors, AuthorSearch, AuthorUpdate
+from database.authorsApi import search_and_save_authors, get_all_authors, AuthorSearch
+
 
 app = FastAPI()
 
@@ -22,11 +23,11 @@ async def get_authors():
     authors = await get_all_authors()
     return {"authors": authors}
 
-@app.post("/updateAuthors")
+@app.post("/postAuthors")
 async def search_authors(search: AuthorSearch):
     authors = await search_and_save_authors(search)
     return {"authors": authors}
 
-@app.put("/postAuthors")
-async def update_author_endpoint(update: AuthorUpdate):
-    return await update_author(update)
+#@app.put("/updateAuthors")
+#async def update_author_endpoint(update: AuthorUpdate):
+#    return await update_author(update)
