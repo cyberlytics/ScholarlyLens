@@ -5,7 +5,7 @@ import Publication from "../components/Publication"
 import Typography from '@mui/material/Typography';
 import { Link } from "react-router-dom";
 import { useParams } from 'react-router-dom';
-import { Author } from '../apiModels/AuthorsInterface';
+import { Author } from '../api/apiModels/Author';
 
 
 const ScholarDetailPage = ({ authors }: { authors: Author[] }) => {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Author } from '../apiModels/AuthorsInterface';
+import { Author } from '../api/apiModels/Author';
 import ScholarRankCard from '../components/ScholarRankCard';
 
 interface ScholarsPageProps {

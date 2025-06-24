@@ -1,7 +1,7 @@
 import { Box, Typography, IconButton, Avatar } from '@mui/material';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
-import { Author } from '../apiModels/AuthorsInterface';
+import { Author } from '../api/apiModels/Author';
 import { useNavigate } from 'react-router-dom';
 
 

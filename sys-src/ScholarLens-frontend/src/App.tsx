@@ -9,7 +9,7 @@ import ScholarDetailPage from './pages/ScholarDetailPage'
 import InstitutDetailPage from './pages/InstitutDetailPage'
 import { Box } from '@mui/material'
 import { useFetch } from './hooks/useFetch';
-import { Author } from './apiModels/AuthorsInterface';
+import { Author } from './api/apiModels/Author';
 
 function App() {
 
