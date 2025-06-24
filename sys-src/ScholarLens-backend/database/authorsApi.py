@@ -6,6 +6,9 @@ from database.models.publication import Publication
 from pydantic import BaseModel
 from typing import Optional, List
 from fastapi import HTTPException
+import uuid
+from uuid import UUID
+from bson import DBRef
 
 
 class InstitutData(BaseModel):
@@ -22,12 +25,152 @@ class AuthorSearch(BaseModel):
 class AuthorUpdate(BaseModel):
     scholar_id: str
 
-async def get_all_authors() -> List[dict]:
+class AuthorWithoutPublications(BaseModel):
+    id: uuid.UUID
+    google_scholar_id: str
+    name: str
+    institut: Optional[InstitutData]
+    interest: List[str]
+    email: str
+    h_index: int
+    i10_index: int
+    citation: int
+    h_index5y: int
+    i10_index5y: int
+    citation5y: int
+    cited_by_years: List[int]
+
+class PublicationData(BaseModel):
+    id: uuid.UUID
+    content: str
+    year: Optional[int]
+    citation: Optional[str]
+    gs_id: Optional[str]
+    citation_count: Optional[int]
+    cited_by_url: Optional[str]
+    cites_id: List[str]
+
+class AuthorFull(BaseModel):
+    id: uuid.UUID
+    google_scholar_id: str
+    name: str
+    institut: Optional[InstitutData]
+    publications: List[PublicationData]
+    interest: List[str]
+    email: str
+    h_index: int
+    i10_index: int
+    citation: int
+    h_index5y: int
+    i10_index5y: int
+    citation5y: int
+    cited_by_years: List[int]
+
+async def get_all_authors() -> List[AuthorWithoutPublications]:
     try:
-        authors = await Author.find_all().to_list()
-        return [author.dict() for author in authors]
+        # Step 1: Load all authors (with publications) as full Beanie documents
+        authors_data = await Author.find_all().to_list()
+
+        result = []
+        for author in authors_data:
+            # Step 2: Remove publications manually
+            author.publications = []
+            print(author.institut)
+            # Step 3: Dereference institut (if present and is DBRef)
+            institut_data = None
+            if author.institut is not None:
+                institut_data = await author.institut.fetch()
+                print(institut_data)
+
+
+            # Step 4: Build response model
+            model_instance = AuthorWithoutPublications(
+                id=author.id,
+                google_scholar_id=author.google_scholar_id,
+                name=author.name,
+                institut=InstitutData(
+                    name=institut_data.name,
+                    domain=institut_data.domain,
+                    webpage=institut_data.webpage,
+                    country=institut_data.country,
+                    country_code=institut_data.country_code
+                ) if institut_data else None,
+                interest=author.interest or [],
+                email=author.email or "",
+                h_index=author.h_index or 0,
+                i10_index=author.i10_index or 0,
+                citation=author.citation or 0,
+                h_index5y=author.h_index5y or 0,
+                i10_index5y=author.i10_index5y or 0,
+                citation5y=author.citation5y or 0,
+                cited_by_years=author.cited_by_years or []
+            )
+
+            result.append(model_instance)
+
+        return result
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve authors: {str(e)}")
+
+
+async def get_author_by_id(author_id: UUID) -> AuthorFull:
+    try:
+        # Get the author document
+        author = await Author.get(author_id)
+
+        if not author:
+            raise HTTPException(status_code=404, detail="Author not found")
+
+        # Fetch linked institut
+        institut_data = None
+        if author.institut is not None:
+            institut = await author.institut.fetch()
+            institut_data = InstitutData(
+                name=institut.name,
+                domain=institut.domain,
+                webpage=institut.webpage,
+                country=institut.country,
+                country_code=institut.country_code
+            )
+
+        # Fetch linked publications
+        publications = []
+        for pub_link in author.publications:
+            publication = await pub_link.fetch()
+            if publication:
+                publications.append(PublicationData(
+                    id=publication.id,
+                    content=publication.content,
+                    year=publication.year,
+                    citation=publication.citation,
+                    gs_id=publication.gs_id,
+                    citation_count=publication.citation_count,
+                    cited_by_url=publication.cited_by_url,
+                    cites_id=publication.cites_id
+                ))
+
+        # Return response
+        return AuthorFull(
+            id=author.id,
+            google_scholar_id=author.google_scholar_id,
+            name=author.name,
+            institut=institut_data,
+            publications=publications,
+            interest=author.interest or [],
+            email=author.email or "",
+            h_index=author.h_index,
+            i10_index=author.i10_index,
+            citation=author.citation,
+            h_index5y=author.h_index5y,
+            i10_index5y=author.i10_index5y,
+            citation5y=author.citation5y,
+            cited_by_years=author.cited_by_years or []
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve author: {str(e)}")
+    
 
 async def search_and_save_authors(search: AuthorSearch) -> List[dict]:
     authors_data = []
@@ -165,3 +308,50 @@ async def search_and_save_authors(search: AuthorSearch) -> List[dict]:
     
     #except Exception as e:
         #raise HTTPException(status_code=500, detail=f"Failed to update author: {str(e)}")
+
+async def get_all_institutes() -> List[Institut]:
+    try:
+        institutes = await Institut.find_all().to_list()
+        return institutes
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve institutes: {str(e)}")
+    
+
+async def get_institut_by_id(institut_id: UUID) -> dict:
+    try:
+        institut = await Institut.get(institut_id, fetch_links=True)
+        if not institut:
+            raise HTTPException(status_code=404, detail="Institut not found")
+
+        # Fetch and serialize each author
+        authors_data = []
+        for author in institut.authors:
+            authors_data.append({
+                "id": author.id,
+                "name": author.name,
+                "google_scholar_id": author.google_scholar_id,
+                "email": author.email,
+                "interest": author.interest,
+                "h_index": author.h_index,
+                "i10_index": author.i10_index,
+                "citation": author.citation,
+                "h_index5y": author.h_index5y,
+                "i10_index5y": author.i10_index5y,
+                "citation5y": author.citation5y,
+                "cited_by_years": author.cited_by_years,
+            })
+
+        # Return institut with authors included
+        return {
+            "id": institut.id,
+            "name": institut.name,
+            "domain": institut.domain,
+            "webpage": institut.webpage,
+            "country": institut.country,
+            "country_code": institut.country_code,
+            "province": institut.province,
+            "authors": authors_data
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve institut: {str(e)}")

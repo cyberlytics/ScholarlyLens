@@ -1,6 +1,7 @@
+from uuid import UUID
 from fastapi import FastAPI
 from database.dbConnection import connect_to_mongo, close_mongo_connection
-from database.authorsApi import search_and_save_authors, get_all_authors, AuthorSearch
+from database.authorsApi import search_and_save_authors, get_all_authors, AuthorSearch, get_author_by_id, get_all_institutes, get_institut_by_id
 
 
 app = FastAPI()
@@ -22,6 +23,18 @@ def read_root():
 async def get_authors():
     authors = await get_all_authors()
     return {"authors": authors}
+
+@app.get("/getAuthorById/{author_id}")
+async def read_author(author_id: UUID):
+    return await get_author_by_id(author_id)
+
+@app.get("/getInstitutes")
+async def get_institutes():
+    return await get_all_institutes();
+
+@app.get("/getInstitutById/{institut_id}")
+async def read_institut(institut_id: UUID):
+    return await get_institut_by_id(institut_id)
 
 @app.post("/postAuthors")
 async def search_authors(search: AuthorSearch):
